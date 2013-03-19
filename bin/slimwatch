@@ -3,7 +3,7 @@
 require 'listen'
 
 if ARGV.count < 1
-  puts "Usage: [-scrtlpohv] [--trace] slimwatch SLIM_DIR\nFor option values, run slimrb --help"
+  puts "Usage: slimwatch [-scrtlpohv] [--trace] SLIM_DIR\nFor option values, run slimrb --help"
   exit
 end
 
