@@ -17,18 +17,25 @@ def main(listen_to, options)
   Listen.to(listen_to, :filter => /\.slim$/) do |modified, added, removed|
 
     modified.each do |filepath|
+      puts "Updating html file for #{ filepath }"
       slim_it(filepath, options)
     end
 
     added.each do |filepath|
+      puts "Creating html file for #{ filepath }"
       slim_it(filepath, options)
     end
 
     removed.each do |filepath|
-      # ignoring these for now
+      #
     end
   end
 
+  puts "Monitoring #{ listen_to } for changes to .slim files"
+  while true do
+    # set up a loop so we don't exit
+    sleep 5
+  end
 end
 
 def slim_it(filename, options)
