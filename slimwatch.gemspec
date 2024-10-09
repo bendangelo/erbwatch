@@ -12,4 +12,5 @@ Gem::Specification.new do |s|
   s.license       = 'GPL-3.0'
   s.add_dependency('slim')
   s.add_dependency('listen')
+  s.add_dependency('logger')
 end
