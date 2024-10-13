@@ -1,0 +1,72 @@
+#!/usr/bin/env ruby
+require 'listen'
+require 'optparse'
+require 'erb'
+
+def parse_options
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: erbwatch [options] ERB_DIR"
+    opts.on("-t", "--trim-mode MODE", "Set trim mode (-, %, <>, >)") { |v| options[:trim_mode] = v }
+    opts.on("-e", "--escape-html", "Escape HTML in the template") { options[:escape_html] = true }
+    opts.on("-o", "--option NAME=CODE") { |v| (options[:options] ||= []) << v }
+    opts.on("-h", "--help") do
+      puts opts
+      exit
+    end
+    opts.on("-v", "--version") do
+      puts "ERBWatch version 1.1"
+      exit
+    end
+  end.parse!
+  if ARGV.empty?
+    puts "Error: ERB_DIR is required."
+    puts "Usage: erbwatch [options] ERB_DIR"
+    exit 1
+  end
+  [options, ARGV.first]
+end
+
+def erb_it(filename, options)
+  infile = filename
+  outfile = infile.sub(/\.erb$/, '')
+  
+  erb = ERB.new(File.read(infile), trim_mode: options[:trim_mode])
+  result = erb.result(binding)
+  
+  result = ERB::Util.html_escape(result) if options[:escape_html]
+  
+  File.write(outfile, result)
+  puts "Generated #{outfile}"
+end
+
+def main(listen_to, options)
+  # Initial run
+  Dir.glob(File.join(listen_to, '**', '*.erb')).each do |filepath|
+    erb_it(filepath, options)
+  end
+
+  # Now listen
+  listener = Listen.to(listen_to, only: /\.erb$/) do |modified, added, removed|
+    (modified + added).each do |filepath|
+      puts "Updating file for #{filepath}"
+      erb_it(filepath, options)
+    end
+    removed.each do |filepath|
+      outfile = filepath.sub(/\.erb$/, '')
+      if File.exist?(outfile)
+        File.delete(outfile)
+        puts "Deleted #{outfile}"
+      end
+    end
+  end
+
+  puts "Monitoring #{listen_to} for changes to .erb files. Press Ctrl-C to stop."
+  listener.start
+  sleep
+rescue Interrupt
+  puts "\nStopping ERBWatch."
+end
+
+options, listen_to = parse_options
+main(listen_to, options)

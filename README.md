@@ -1,20 +1,19 @@
-# slimwatch
+# Erbwatch
 
-A lightweight command line tool to generate HTML files from your SLIM templates when they change on disk.
+A lightweight command line tool to generate HTML files from your erb templates when they change on disk.
 
 ## Install
-gem install slimwatch
+gem install erbwatch
 
 ## Usage
 ```
-slimwatch [-scrtlpohv] [--trace]  SLIM_DIR
+erbwatch [-scrtlpohv] [--trace]  ERB_DIR
 ```
 
 ## Testing
 
 ```
-bin/slimwatch test
+bin/erbwatch test
 ```
 
-The options are passed directly to slimrb.  Run 'slimrb --help' for documentation on
-the various options.
+The options are passed directly to erb.  Run 'erb --help' for documentation on the various options.
